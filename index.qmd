@@ -1,0 +1,103 @@
+---
+title: "Data Nuggets"
+author: "owid"
+date: "5 May 2025"
+date-format: "DD MMMM YYYY"
+toc: false
+number-sections: false
+format:
+  html: 
+    css: trial.css
+    fontcolor: '#024161'
+    backgroundcolor: '#FDF1CB'
+    linestretch: 1.7
+    embed-resources: true
+    code-fold: true
+    grid:
+      sidebar-width: 400px
+      body-width: 600px
+      margin-width: 400px
+      gutter-width: 1.5rem
+---
+
+## Antibiotics Use
+
+```{r}
+#| echo: true
+#| message: false
+#| warning: false
+
+library(tidyverse)
+library(dplyr)
+library(ggrepel)
+
+# Data (as provided in the image)
+data_anti <- data.frame(
+  Country = c("Denmark", "Spain", "UK", "Italy", "France", "Netherlands"),
+  Year_2010 = c(0, 0, 0, 0, 0, 0),
+  Year_2022 = c(-32, -43, -60, -70, -75, -76)
+)
+
+# Reshape the data for ggplot2
+data_long <- data_anti %>%
+  tidyr::pivot_longer(
+    cols = starts_with("Year"),
+    names_to = "Year",
+    values_to = "Change"
+  ) %>%
+  mutate(Year = gsub("Year_", "", Year))  # Remove "Year_"
+
+# Define colors for each country
+country_colors <- c("Denmark" = "#d73027", "Spain" = "#91bf96", "UK" = "#2e86ab", "Italy" = "#018000", "France" = "#F5CA45","Netherlands" = "#04078f")
+
+# Create the line chart
+ggplot(data_long, aes(x = Year, y = Change, group = Country, color = Country)) +
+  geom_line(linewidth = 1.3) +
+  geom_point(size = 4.1) +
+  scale_color_manual(values = country_colors) +
+  geom_text(
+    data = data_long %>% filter(Year == "2022"),
+    aes(label = paste0(Country, " ", Change, "%")),
+    hjust = -0.2,
+    vjust = 0.5,
+    size = 3
+  ) +
+  labs(
+    title = "Europe has reduced antibiotics \nused in livestock over the past 10 years",
+    subtitle = "The change in the sales of antimicrobials",
+    caption = "Data source: European Medicines Agency (2023)" ) +
+  theme_minimal() + # Use a minimal theme
+  theme(
+    axis.title.x = element_blank(), # Remove x-axis title
+    axis.title.y = element_blank(), # Remove y-axis title
+    legend.text = element_text(size = rel(0.8)),
+    legend.key.size = unit(0.6, "lines"), 
+    legend.justification = "center", 
+    legend.position = "none",
+    axis.text = element_text(color = "grey20", size = rel(0.9)),
+    plot.title = element_text(size = rel(1.4), color = "black", face = "bold", hjust = 0.5),
+        plot.subtitle = element_text(size = rel(0.8), color = "black", hjust = 0.5),
+    plot.caption = element_text(size = rel(0.7), color = "grey30", hjust = 0),
+    panel.background = element_rect(fill = "#FDF1CB",
+                                colour = "#FDF1CB",
+                                size = 0, linetype = "solid"),
+    panel.border = element_blank(),
+    plot.background = element_rect(fill = "#FDF1CB", color = NA),
+    panel.grid.major.x = element_blank(), # Remove vertical grid lines
+    panel.grid.minor = element_blank()    # Remove minor grid lines
+  )
+```
+
+<strong>Source: Our World in Data (chart reproduced)</strong>
+
+Antibiotics can play an important role in preventing disease and improving the health of animals. But overusing them, particularly for livestock, poses a risk to human health through [antibiotic resistance](https://ourworldindata.org/antibiotics).
+
+Over the last decade, Europe has made much progress in reducing antibiotic use in farm animals. This has been achieved through stricter regulations and, in some countries, taxes on antibiotics.
+
+The chart shows the change in sales of these antimicrobials for livestock between 2010 and 2022. It shows a range of European countries, with a few examples highlighted in bold.
+
+Antibiotic use has fallen by over half in some countries, such as the UK, Italy, France, and the Netherlands.
+
+These countries have still managed to maintain productive agricultural sectors by focusing on other ways to manage disease risk and animal growth, such as vaccinations, ventilation, cleaner equipment, and high-quality diets.
+
+Go to the original link at [OWID](https://ourworldindata.org/data-insights/2)
