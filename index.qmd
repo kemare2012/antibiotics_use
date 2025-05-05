@@ -1,6 +1,6 @@
 ---
 title: "Data Nuggets"
-author: "owid"
+author: "OWID"
 date: "5 May 2025"
 date-format: "DD MMMM YYYY"
 toc: false
